@@ -1,0 +1,155 @@
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.app {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+}
+
+.search-container {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  z-index: 10;
+}
+
+.search-box {
+  display: flex;
+  background: white;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 12px;
+  font-size: 16px;
+}
+
+.search-box button {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 0 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.search-box button:hover {
+  background: #1d4ed8;
+}
+
+.search-results {
+  margin-top: 6px;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.search-result {
+  width: 100%;
+  border: none;
+  background: white;
+  text-align: left;
+  padding: 12px 15px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.search-result:hover {
+  background: #f3f4f6;
+}
+
+.search-result strong {
+  font-size: 15px;
+}
+
+.search-result span {
+  font-size: 13px;
+  color: #666;
+}
+.route-button {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.route-button:hover {
+  background: #1d4ed8;
+}
+
+.route-info {
+  position: absolute;
+  bottom: 90px;
+  left: 20px;
+  z-index: 10;
+  background: white;
+  padding: 15px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.route-info h3 {
+  margin-top: 0;
+}
+.clear-route-button {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  border: none;
+  background: #dc2626;
+  color: white;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.clear-route-button:hover {
+  background: #b91c1c;
+}
+.search-error {
+  margin-top: 6px;
+  background: white;
+  color: #dc2626;
+  padding: 12px 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+}
