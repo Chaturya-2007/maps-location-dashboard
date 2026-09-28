@@ -5,6 +5,7 @@ import "./App.css";
 
 function App() {
   const [destination, setDestination] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
   const [showRoute, setShowRoute] = useState(false);
   const [routeInfo, setRouteInfo] = useState(null);
   const [routeLoading, setRouteLoading] = useState(false);
@@ -24,7 +25,10 @@ function App() {
 
   return (
     <div className="app">
-      <SearchBar onSelectLocation={handleDestination} />
+      <SearchBar
+        onSelectLocation={handleDestination}
+        userLocation={userLocation}
+      />
 
       <Map
         destination={destination}
@@ -32,6 +36,7 @@ function App() {
         onRouteInfo={setRouteInfo}
         onRouteLoading={setRouteLoading}
         clearRoute={!showRoute}
+        onUserLocation={setUserLocation}
       />
 
       {destination && !showRoute && (

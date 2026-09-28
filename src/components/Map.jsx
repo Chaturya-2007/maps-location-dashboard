@@ -8,6 +8,7 @@ function Map({
   onRouteInfo,
   onRouteLoading,
   clearRoute,
+  onUserLocation,
 }) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
@@ -41,10 +42,18 @@ function Map({
 
     // Get user's current location
     geolocate.on("geolocate", (event) => {
+      const location = {
+        longitude: event.coords.longitude,
+        latitude: event.coords.latitude,
+      };
+
       userLocationRef.current = [
-        event.coords.longitude,
-        event.coords.latitude,
+        location.longitude,
+        location.latitude,
       ];
+
+      // Send location to App.jsx
+      onUserLocation(location);
     });
 
     // Location error
@@ -57,17 +66,32 @@ function Map({
     return () => {
       mapRef.current?.remove();
     };
-  }, []);
+  }, [onUserLocation]);
 
   // Destination marker
   useEffect(() => {
     if (!mapRef.current || !destination) return;
 
+    // Remove previous marker
     if (destinationMarkerRef.current) {
       destinationMarkerRef.current.remove();
     }
 
-    destinationMarkerRef.current = new mapboxgl.Marker()
+    // Create a clearly visible destination marker
+    const markerElement = document.createElement("div");
+
+    markerElement.style.width = "24px";
+    markerElement.style.height = "24px";
+    markerElement.style.backgroundColor = "#dc2626";
+    markerElement.style.border = "4px solid white";
+    markerElement.style.borderRadius = "50%";
+    markerElement.style.boxShadow =
+      "0 2px 8px rgba(0, 0, 0, 0.4)";
+
+    destinationMarkerRef.current = new mapboxgl.Marker({
+      element: markerElement,
+      anchor: "center",
+    })
       .setLngLat([
         destination.longitude,
         destination.latitude,
@@ -95,7 +119,9 @@ function Map({
     if (mapRef.current.getSource("route")) {
       mapRef.current.removeSource("route");
     }
-  }, [clearRoute]);
+
+    onRouteInfo(null);
+  }, [clearRoute, onRouteInfo]);
 
   // Draw route
   useEffect(() => {
@@ -105,6 +131,7 @@ function Map({
 
     const getRoute = async () => {
       onRouteLoading(true);
+      onRouteInfo(null);
 
       try {
         // Check user's location
@@ -113,7 +140,6 @@ function Map({
             "Your current location is not available. Please click the location button first."
           );
 
-          onRouteLoading(false);
           return;
         }
 
@@ -130,8 +156,10 @@ function Map({
           `https://api.mapbox.com/directions/v5/mapbox/driving/` +
           `${origin[0]},${origin[1]};` +
           `${destinationCoords[0]},${destinationCoords[1]}` +
-          `?overview=full` +
+          `?alternatives=true` +
+          `&overview=full` +
           `&geometries=geojson` +
+          `&steps=true` +
           `&access_token=${token}`;
 
         const response = await fetch(url);
@@ -145,12 +173,22 @@ function Map({
         // No route found
         if (!data.routes || data.routes.length === 0) {
           alert("No route could be found for this destination.");
-
-          onRouteLoading(false);
           return;
         }
 
-        const route = data.routes[0];
+        /*
+          Mapbox normally returns routes ordered by recommended
+          route. We select the route with the shortest distance
+          when multiple alternatives are available.
+        */
+        const route = data.routes.reduce(
+          (shortest, current) => {
+            return current.distance < shortest.distance
+              ? current
+              : shortest;
+          },
+          data.routes[0]
+        );
 
         // Distance and duration
         const distance = (route.distance / 1000).toFixed(2);
@@ -197,21 +235,26 @@ function Map({
         // Fit map to route
         const coordinates = route.geometry.coordinates;
 
-        const bounds = coordinates.reduce(
-          (bounds, coordinate) => {
-            return bounds.extend(coordinate);
-          },
-          new mapboxgl.LngLatBounds(
-            coordinates[0],
-            coordinates[0]
-          )
-        );
+        if (coordinates.length > 0) {
+          const bounds = coordinates.reduce(
+            (bounds, coordinate) => {
+              return bounds.extend(coordinate);
+            },
+            new mapboxgl.LngLatBounds(
+              coordinates[0],
+              coordinates[0]
+            )
+          );
 
-        mapRef.current.fitBounds(bounds, {
-          padding: 80,
-        });
+          mapRef.current.fitBounds(bounds, {
+            padding: 80,
+            maxZoom: 15,
+          });
+        }
       } catch (error) {
         console.error(error);
+
+        onRouteInfo(null);
 
         alert(
           "Unable to find a route. Please check your internet connection and try again."
